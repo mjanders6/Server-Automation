@@ -1,6 +1,6 @@
 [siem_servers]
-rpi0@192.168.1.20
-rpi1@192.168.1.21
+rpi0-server
+rpi1-server
 
 [vm_stack]
-rpi2@192.168.1.22
+kali-server
