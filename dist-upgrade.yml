@@ -7,8 +7,26 @@
       apt:
         update_cache: yes
 
+    - name: Check for upgradable packages
+      command: apt list --upgradable
+      register: apt_upgrade_check
+      changed_when: false
+
+    - name: Show upgradable packages
+      debug:
+        var: apt_upgrade_check.stdout_lines
+
     - name: Perform distribution upgrade
       apt:
         upgrade: dist
         autoclean: yes
         autoremove: yes
+
+    - name: Check for remaining upgradable packages after dist-upgrade
+      command: apt list --upgradable
+      register: apt_upgrade_check_post
+      changed_when: false
+
+    - name: Show remaining upgradable packages after dist-upgrade
+      debug:
+        var: apt_upgrade_check_post.stdout_lines
