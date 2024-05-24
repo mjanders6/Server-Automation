@@ -1,0 +1,14 @@
+---
+- name: Perform Distribution Upgrade
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update APT package list
+      apt:
+        update_cache: yes
+
+    - name: Perform distribution upgrade
+      apt:
+        upgrade: dist
+        autoclean: yes
+        autoremove: yes
