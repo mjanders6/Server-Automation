@@ -1,6 +1,6 @@
 ---
 - name: Install Suricata
-  hosts: all
+  hosts: net-sec-monitor
   become: yes
   tasks:
     - name: Update APT package list
