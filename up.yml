@@ -8,10 +8,6 @@
       apt:
         update_cache: yes
 
-    - name: Show upgradable packages
-      debug:
-        var: apt_upgrade_check_before.stdout_lines
-
     - name: Perform distribution upgrade
       apt:
         upgrade: dist
