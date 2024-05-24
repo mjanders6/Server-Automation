@@ -2,19 +2,20 @@
 - name: Perform Distribution Upgrade
   hosts: all
   become: yes
+
   tasks:
     - name: Update APT package list
       apt:
         update_cache: yes
 
-    - name: Check for upgradable packages
+    - name: Check for upgradable packages before dist-upgrade
       command: apt list --upgradable
-      register: apt_upgrade_check
+      register: apt_upgrade_check_before
       changed_when: false
 
-    - name: Show upgradable packages
+    - name: Show upgradable packages before dist-upgrade
       debug:
-        var: apt_upgrade_check.stdout_lines
+        var: apt_upgrade_check_before.stdout_lines
 
     - name: Perform distribution upgrade
       apt:
@@ -22,11 +23,27 @@
         autoclean: yes
         autoremove: yes
 
-    - name: Check for remaining upgradable packages after dist-upgrade
+    - name: Check for upgradable packages after dist-upgrade
       command: apt list --upgradable
-      register: apt_upgrade_check_post
+      register: apt_upgrade_check_after
       changed_when: false
 
     - name: Show remaining upgradable packages after dist-upgrade
       debug:
-        var: apt_upgrade_check_post.stdout_lines
+        var: apt_upgrade_check_after.stdout_lines
+
+    - name: Force upgrade of all upgradable packages if any remain
+      apt:
+        name: "{{ item }}"
+        state: latest
+      with_items: "{{ apt_upgrade_check_after.stdout_lines | map('regex_replace', '^([^/]+).+$', '\\1') | list }}"
+      when: apt_upgrade_check_after.stdout_lines is defined and apt_upgrade_check_after.stdout_lines | length > 0
+
+    - name: Final check for upgradable packages
+      command: apt list --upgradable
+      register: apt_upgrade_check_final
+      changed_when: false
+
+    - name: Show final list of upgradable packages
+      debug:
+        var: apt_upgrade_check_final.stdout_lines
