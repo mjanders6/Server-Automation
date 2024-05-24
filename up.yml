@@ -1,5 +1,5 @@
 ---
-- name: Update and Upgrade Packages
+- name: Perform Distribution Upgrade
   hosts: all
   become: yes
 
@@ -8,8 +8,26 @@
       apt:
         update_cache: yes
 
+    - name: Check for upgradable packages before dist-upgrade
+      command: apt list --upgradable
+      register: apt_upgrade_check_before
+      changed_when: false
+
+    - name: Show upgradable packages before dist-upgrade
+      debug:
+        var: apt_upgrade_check_before.stdout_lines
+
     - name: Perform distribution upgrade
       apt:
         upgrade: dist
         autoclean: yes
         autoremove: yes
+
+    - name: Check for upgradable packages after dist-upgrade
+      command: apt list --upgradable
+      register: apt_upgrade_check_after
+      changed_when: false
+
+    - name: Show remaining upgradable packages after dist-upgrade
+      debug:
+        var: apt_upgrade_check_after.stdout_lines
