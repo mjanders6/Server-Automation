@@ -1,0 +1,42 @@
+---
+- name: Install Suricata
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update APT package list
+      apt:
+        update_cache: yes
+
+    - name: Install required dependencies
+      apt:
+        name: 
+          - software-properties-common
+          - apt-transport-https
+          - wget
+        state: present
+
+    - name: Add Suricata repository key
+      apt_key:
+        url: https://packages.suricata.io/Suricata-DEB-PGP-GPG-KEY
+        state: present
+
+    - name: Add Suricata repository
+      apt_repository:
+        repo: "deb https://packages.suricata.io/debian {{ ansible_distribution_release }} main"
+        state: present
+        filename: suricata
+
+    - name: Update APT package list again
+      apt:
+        update_cache: yes
+
+    - name: Install Suricata
+      apt:
+        name: suricata
+        state: present
+
+    - name: Enable Suricata service
+      systemd:
+        name: suricata
+        enabled: yes
+        state: started
