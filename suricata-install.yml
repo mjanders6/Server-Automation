@@ -1,7 +1,15 @@
 ---
-- name: Install Suricata
+- name: Install and Configure Suricata
   hosts: net-sec-monitor
   become: yes
+
+  vars:
+    suricata_repo_key: https://packages.suricata.io/Suricata-DEB-PGP-GPG-KEY
+    suricata_repo: "deb https://packages.suricata.io/debian {{ ansible_distribution_release }} main"
+    suricata_config_path: /etc/suricata/suricata.yaml
+    suricata_interface: enp6s18  # Change this to your network interface
+    suricata_home_net: "[192.168.1.0/24]"  # Change this to your home network CIDR
+
   tasks:
     - name: Update APT package list
       apt:
@@ -17,12 +25,12 @@
 
     - name: Add Suricata repository key
       apt_key:
-        url: https://packages.suricata.io/Suricata-DEB-PGP-GPG-KEY
+        url: "{{ suricata_repo_key }}"
         state: present
 
     - name: Add Suricata repository
       apt_repository:
-        repo: "deb https://packages.suricata.io/debian {{ ansible_distribution_release }} main"
+        repo: "{{ suricata_repo }}"
         state: present
         filename: suricata
 
@@ -35,8 +43,35 @@
         name: suricata
         state: present
 
-    - name: Enable Suricata service
+    - name: Create backup of the original suricata.yaml
+      copy:
+        src: "{{ suricata_config_path }}"
+        dest: "{{ suricata_config_path }}.bak"
+        remote_src: yes
+        backup: yes
+
+    - name: Configure Suricata
+      blockinfile:
+        path: "{{ suricata_config_path }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        block: |
+          vars:
+            HOME_NET: "{{ suricata_home_net }}"
+          af-packet:
+            - interface: "{{ suricata_interface }}"
+              threads: auto
+              cluster-id: 99
+              cluster-type: cluster_flow
+              defrag: yes
+              use-mmap: yes
+          outputs:
+            - eve-log:
+                enabled: yes
+                filetype: regular
+                filename: /var/log/suricata/eve.json
+
+    - name: Ensure Suricata is enabled and started
       systemd:
         name: suricata
         enabled: yes
-        state: started
+        state: restarted
