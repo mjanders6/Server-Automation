@@ -9,7 +9,7 @@
         update_cache: yes
       register: update_result
     
-      - name: Debug cache update result
+    - name: Debug cache update result
       debug:
         msg: "Cache updated: {{ update_result.cache_updated }}"
 
