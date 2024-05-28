@@ -1,0 +1,47 @@
+---
+- name: Configure Suricata
+  hosts: net-sec-server
+  become: yes
+
+  vars:
+    suricata_config_path: /etc/suricata/suricata.yaml
+    suricata_interface: eth0  # Change this to your network interface
+    suricata_home_net: "[192.168.1.0/24]"  # Change this to your home network CIDR
+
+  tasks:
+    - name: Update APT package list
+      apt:
+        update_cache: yes
+
+    - name: Create backup of the original suricata.yaml
+      copy:
+        src: "{{ suricata_config_path }}"
+        dest: "{{ suricata_config_path }}.bak"
+        remote_src: yes
+        backup: yes
+
+    - name: Configure Suricata
+      blockinfile:
+        path: "{{ suricata_config_path }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        block: |
+          vars:
+            HOME_NET: "{{ suricata_home_net }}"
+          af-packet:
+            - interface: "{{ suricata_interface }}"
+              threads: auto
+              cluster-id: 99
+              cluster-type: cluster_flow
+              defrag: yes
+              use-mmap: yes
+          outputs:
+            - eve-log:
+                enabled: yes
+                filetype: regular
+                filename: /var/log/suricata/eve.json
+
+    - name: Ensure Suricata is enabled and started
+      systemd:
+        name: suricata
+        enabled: yes
+        state: restarted
