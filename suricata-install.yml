@@ -1,6 +1,6 @@
 ---
 - name: Add Suricata PPA and Install Suricata
-  hosts: all
+  hosts: net-sec-server
   become: yes
 
   tasks:
