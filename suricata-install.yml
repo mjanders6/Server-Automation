@@ -1,6 +1,6 @@
 ---
 - name: Install and Configure Suricata
-  hosts: net-sec-monitor
+  hosts: net-sec-server
   become: yes
 
   vars:
