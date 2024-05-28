@@ -4,8 +4,7 @@
   become: yes
 
   vars:
-    suricata_repo_key: https://packages.suricata.io/Suricata-DEB-PGP-GPG-KEY
-    suricata_repo: "deb https://packages.suricata.io/debian {{ ansible_distribution_release }} main"
+    suricata_repo: "ppa:oisf/suricata-stable"
     suricata_config_path: /etc/suricata/suricata.yaml
     suricata_interface: enp6s18  # Change this to your network interface
     suricata_home_net: "[192.168.1.0/24]"  # Change this to your home network CIDR
@@ -21,11 +20,6 @@
           - software-properties-common
           - apt-transport-https
           - wget
-        state: present
-
-    - name: Add Suricata repository key
-      apt_key:
-        url: "{{ suricata_repo_key }}"
         state: present
 
     - name: Add Suricata repository
