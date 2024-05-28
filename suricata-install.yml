@@ -1,34 +1,15 @@
 ---
-- name: Install and Configure Suricata
-  hosts: net-sec-server
+- name: Add Suricata PPA and Install Suricata
+  hosts: all
   become: yes
 
-  vars:
-    suricata_repo: "ppa:oisf/suricata-stable"
-    suricata_config_path: /etc/suricata/suricata.yaml
-    suricata_interface: enp6s18  # Change this to your network interface
-    suricata_home_net: "[192.168.1.0/24]"  # Change this to your home network CIDR
-
   tasks:
-    - name: Update APT package list
-      apt:
-        update_cache: yes
-
-    - name: Install required dependencies
-      apt:
-        name: 
-          - software-properties-common
-          - apt-transport-https
-          - wget
-        state: present
-
-    - name: Add Suricata repository
+    - name: Add the Suricata PPA repository
       apt_repository:
-        repo: "{{ suricata_repo }}"
+        repo: "ppa:oisf/suricata-stable"
         state: present
-        filename: suricata
 
-    - name: Update APT package list again
+    - name: Update the APT package list
       apt:
         update_cache: yes
 
@@ -37,35 +18,16 @@
         name: suricata
         state: present
 
-    - name: Create backup of the original suricata.yaml
-      copy:
-        src: "{{ suricata_config_path }}"
-        dest: "{{ suricata_config_path }}.bak"
-        remote_src: yes
-        backup: yes
-
-    - name: Configure Suricata
-      blockinfile:
-        path: "{{ suricata_config_path }}"
-        marker: "# {mark} ANSIBLE MANAGED BLOCK"
-        block: |
-          vars:
-            HOME_NET: "{{ suricata_home_net }}"
-          af-packet:
-            - interface: "{{ suricata_interface }}"
-              threads: auto
-              cluster-id: 99
-              cluster-type: cluster_flow
-              defrag: yes
-              use-mmap: yes
-          outputs:
-            - eve-log:
-                enabled: yes
-                filetype: regular
-                filename: /var/log/suricata/eve.json
-
-    - name: Ensure Suricata is enabled and started
+    - name: Ensure Suricata is started and enabled
       systemd:
         name: suricata
+        state: started
         enabled: yes
-        state: restarted
+
+    - name: Display Suricata version
+      command: suricata --build-info
+      register: suricata_info
+
+    - name: Show Suricata version
+      debug:
+        msg: "{{ suricata_info.stdout_lines }}"
