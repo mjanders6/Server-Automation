@@ -7,6 +7,7 @@
     - name: Update APT package list
       apt:
         update_cache: yes
+      ignore_errors: yes
 
     - name: Check for upgradable packages before dist-upgrade
       command: apt list --upgradable
