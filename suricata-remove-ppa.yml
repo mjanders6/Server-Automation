@@ -15,13 +15,14 @@
         update_cache: yes
       ignore_errors: yes
 
-    - name: Add the Suricata PPA repository
-      apt_repository:
-        repo: "ppa:oisf/suricata-stable"
-        state: present
-      ignore_errors: yes
+    # - name: Add the Suricata PPA repository
+    #   apt_repository:
+    #     repo: "ppa:oisf/suricata-stable"
+    #     state: present
+    #   ignore_errors: yes
 
-    - name: Update the APT package list
-      apt:
-        update_cache: yes
-      ignore_errors: yes
+    # - name: Update the APT package list
+    #   apt:
+    #     update_cache: yes
+    #   ignore_errors: yes
+
