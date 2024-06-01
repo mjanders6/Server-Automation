@@ -8,31 +8,38 @@
       apt:
         update_cache: yes
       register: update_result
+      ignore_errors: yes
     
     - name: Debug cache update result
       debug:
         msg: "Cache updated: {{ update_result.cache_updated }}"
+      ignore_errors: yes
 
     - name: Check for upgradable packages before dist-upgrade
       command: apt list --upgradable
       register: apt_upgrade_check_before
       changed_when: false
+      ignore_errors: yes
 
     - name: Show upgradable packages before dist-upgrade
       debug:
         var: apt_upgrade_check_before.stdout_lines
+      ignore_errors: yes
 
     - name: Perform distribution upgrade
       apt:
         upgrade: dist
         autoclean: yes
         autoremove: yes
+      ignore_errors: yes
 
     - name: Check for upgradable packages after dist-upgrade
       command: apt list --upgradable
       register: apt_upgrade_check_after
       changed_when: false
+      ignore_errors: yes
 
     - name: Show remaining upgradable packages after dist-upgrade
       debug:
         var: apt_upgrade_check_after.stdout_lines
+      ignore_errors: yes
