@@ -1,35 +1,57 @@
 ---
-- name: Add Suricata PPA and Install Suricata
-  hosts: net-sec-server
+- name: Add Suricata PPA and Install Suricata using apt-get
+  hosts: suricata-server
   become: yes
 
   tasks:
-    - name: Add the Suricata PPA repository
-      apt_repository:
-        repo: "ppa:oisf/suricata-stable"
-        state: present
+    - name: Install software-properties-common if not present
+      command: apt-get install -y software-properties-common
+      register: install_common_result
+      ignore_errors: yes
+
+    - name: Add Suricata PPA
+      command: add-apt-repository -y ppa:oisf/suricata-stable
+      register: add_repo_result
       ignore_errors: yes
 
     - name: Update the APT package list
-      apt:
-        update_cache: yes
+      command: apt-get update
+      register: update_result
+      ignore_errors: yes
+
+    - name: Upgrade all APT packages
+      command: apt-get -y upgrade
+      register: upgrade_result
       ignore_errors: yes
 
     - name: Install Suricata
-      apt:
-        name: suricata
-        state: present
+      command: apt-get install -y suricata
+      register: install_suricata_result
+      ignore_errors: yes
 
     - name: Ensure Suricata is started and enabled
       systemd:
         name: suricata
         state: started
         enabled: yes
+      ignore_errors: yes
 
-    - name: Display Suricata version
-      command: suricata --build-info
-      register: suricata_info
-
-    - name: Show Suricata version
+    - name: Display install common result
       debug:
-        msg: "{{ suricata_info.stdout_lines }}"
+        msg: "{{ install_common_result.stdout }}"
+
+    - name: Display add repo result
+      debug:
+        msg: "{{ add_repo_result.stdout }}"
+
+    - name: Display update result
+      debug:
+        msg: "{{ update_result.stdout }}"
+
+    - name: Display upgrade result
+      debug:
+        msg: "{{ upgrade_result.stdout }}"
+
+    - name: Display install suricata result
+      debug:
+        msg: "{{ install_suricata_result.stdout }}"
