@@ -1,0 +1,55 @@
+---
+- name: Add Suricata PPA and Install Suricata using apt-get
+  hosts: elastic-server
+  become: yes
+
+  tasks:
+    - name: Add the Elastic GPG key to your server 
+      command: curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+      register: elastic_gpg
+      ignore_errors: yes
+
+    - name: Add the Elastic source list to the sources.list.d directory
+      command: echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+      register: add_src_list
+      ignore_errors: yes
+
+    - name: Update APT package list
+      apt:
+        update_cache: yes
+      register: update_result
+      ignore_errors: yes
+
+    - name: Install Elasticsearch
+      apt:
+        name: elasticsearch
+        state: present
+      register: install_elasticsearch
+      ignore_errors: yes
+
+    - name: Install Kibana
+      apt: 
+        name: kibana
+        state: present
+      register: install_kibana
+      ignore_errors: yes
+
+    - name: Display GPG Result
+      debug:
+        msg: "{{ elastic_gpg.stdout }}"
+    
+    - name: Add Sources list
+      debug:
+        msg: "{{ add_src_list.stdout }}"
+
+    - name: Update Packages
+      debug: 
+        msg: "{{ update_result.stdout }}"
+
+    - name: Elasticsearch Installation Results
+      debug: 
+        msg: "{{ install_elasticsearch.stdout }}"
+
+    - name: Kibana Installation Results
+      debug: 
+        msg: "{{ install_kibana.stdout }}"
