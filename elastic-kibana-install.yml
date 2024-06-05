@@ -11,12 +11,16 @@
       ignore_errors: yes
 
     - name: Add the Elastic GPG key to your server 
-      command: curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+      shell: curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+      args: 
+        warn: false
       register: elastic_gpg
       ignore_errors: yes
 
     - name: Add the Elastic source list to the sources.list.d directory
-      command: echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+      shell: echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+      args:
+        warn: false
       register: add_src_list
       ignore_errors: yes
 
