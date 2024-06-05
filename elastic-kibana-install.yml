@@ -4,6 +4,12 @@
   become: yes
 
   tasks:
+      - name: Update APT package list
+      apt:
+        update_cache: yes
+      register: update_result1
+      ignore_errors: yes
+
     - name: Add the Elastic GPG key to your server 
       command: curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
       register: elastic_gpg
@@ -17,7 +23,7 @@
     - name: Update APT package list
       apt:
         update_cache: yes
-      register: update_result
+      register: update_result2
       ignore_errors: yes
 
     - name: Install Elasticsearch
@@ -34,6 +40,10 @@
       register: install_kibana
       ignore_errors: yes
 
+    - name: Update Packages
+      debug: 
+        msg: "{{ update_result1.stdout }}"
+
     - name: Display GPG Result
       debug:
         msg: "{{ elastic_gpg.stdout }}"
@@ -44,7 +54,7 @@
 
     - name: Update Packages
       debug: 
-        msg: "{{ update_result.stdout }}"
+        msg: "{{ update_result2.stdout }}"
 
     - name: Elasticsearch Installation Results
       debug: 
