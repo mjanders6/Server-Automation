@@ -1,8 +1,0 @@
-[siem_server]
-rpi0@192.168.1.20
-
-[net-sec-monitor]
-rpi1@192.168.1.21
-
-[vm_stack]
-kali@192.168.1.22

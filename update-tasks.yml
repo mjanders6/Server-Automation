@@ -38,3 +38,6 @@
   debug:
     var: apt_upgrade_check_after.stdout_lines
   ignore_errors: yes
+
+- name: Restart Servers
+  shell: sudo reboot
