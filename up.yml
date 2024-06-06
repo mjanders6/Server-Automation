@@ -43,12 +43,3 @@
       debug:
         var: apt_upgrade_check_after.stdout_lines
       ignore_errors: yes
-
-    - name: Restart Servers
-      shell: sudo reboot
-      register: restart_servers
-      ignore_errors: yes
-    
-    - name: Restart Server Log
-      debug:
-        msg: "{{ restart_servers.stdout }}"
