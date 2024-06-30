@@ -6,4 +6,4 @@
   tasks:
     - name: Restart the machine
       reboot:
-        reboot_timeout: 300
+        reboot_timeout: 5
