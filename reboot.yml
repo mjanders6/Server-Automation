@@ -1,0 +1,9 @@
+---
+- name: Restart hosts
+  hosts: all
+  become: yes
+  
+  tasks:
+    - name: Restart the machine
+      reboot:
+        reboot_timeout: 300
