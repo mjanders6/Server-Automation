@@ -1,59 +1,60 @@
 ---
-- name: Install and configure Docker on Ubuntu
+- name: Install Docker on Ubuntu
   hosts: all
-  become: yes  # Ensure commands are run with sudo
-  tasks:
-    - name: Update apt package list
-      apt:
-        update_cache: yes
+  become: yes
 
-    - name: Install dependancies
+  tasks:
+    - name: Install prerequisites
       apt:
-        name:
-          - apt-transport-https
+        name: 
           - ca-certificates
           - curl
-          - software-properties-common
+          - gnupg
         state: present
+        update_cache: yes
 
-    - name: Add Docker's official GPG key
-      shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+    - name: Create directory for Docker GPG key
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Add Docker GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.gpg
+        mode: '0644'
+      register: docker_gpg
+
+    - name: Convert GPG key to keyring format
+      command: gpg --dearmor -o /etc/apt/keyrings/docker.gpg
       args:
-        warn: false
+        creates: /etc/apt/keyrings/docker.gpg
+      when: docker_gpg.changed
 
-    - name: Add Docker's official APT repository
-      apt_repository:
-        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
-        state: present
+    - name: Add Docker repository
+      copy:
+        dest: /etc/apt/sources.list.d/docker.list
+        content: |
+          deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable
+      notify: Update apt cache
 
-    - name: Update apt package list after adding Docker repository
+    - name: Update apt cache
       apt:
         update_cache: yes
 
-    - name: Install Docker CE
+    - name: Install Docker packages
       apt:
-        name: docker-ce
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
         state: present
 
-    - name: Enable Docker service to start on boot
-      systemd:
-        name: docker
-        enabled: yes
-
-    - name: Ensure Docker service is running
-      systemd:
-        name: docker
-        state: started
-
-    - name: Add current user to the Docker group
-      shell: usermod -aG docker ${USER}
-      args:
-        warn: false
-
-    - name: Display Docker service status
-      shell: systemctl status docker
-      register: docker_status_output
-
-    - name: Print Docker service status output
-      debug:
-        var: docker_status_output.stdout
+    - name: Add current user to Docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
