@@ -1,7 +1,0 @@
----
-all:
-  hosts:
-    rpi0:
-      ansible_host: rpi0-server
-      ansible_user: rpi0
-
