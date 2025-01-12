@@ -39,10 +39,6 @@
           deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable
       notify: Update apt cache
 
-    - name: Update apt cache
-      apt:
-        update_cache: yes
-
     - name: Install Docker packages
       apt:
         name:
@@ -58,3 +54,8 @@
         name: "{{ ansible_user }}"
         groups: docker
         append: yes
+
+  handlers:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
