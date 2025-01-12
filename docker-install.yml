@@ -6,7 +6,7 @@
   tasks:
     - name: Install prerequisites
       apt:
-        name: 
+        name:
           - ca-certificates
           - curl
           - gnupg
@@ -19,18 +19,16 @@
         state: directory
         mode: '0755'
 
-    - name: Add Docker GPG key
+    - name: Download Docker GPG key
       ansible.builtin.get_url:
         url: https://download.docker.com/linux/ubuntu/gpg
         dest: /etc/apt/keyrings/docker.gpg
         mode: '0644'
-      register: docker_gpg
 
-    - name: Convert GPG key to keyring format
-      command: gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-      args:
-        creates: /etc/apt/keyrings/docker.gpg
-      when: docker_gpg.changed
+    - name: Set permissions for Docker GPG key
+      file:
+        path: /etc/apt/keyrings/docker.gpg
+        mode: '0644'
 
     - name: Add Docker repository
       copy:
@@ -38,6 +36,10 @@
         content: |
           deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable
       notify: Update apt cache
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
 
     - name: Install Docker packages
       apt:
