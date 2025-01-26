@@ -7,3 +7,6 @@ all:
     rpi2:
       ansible_host: rpi2
       ansible_user: rpi2
+    rpi3:
+      ansible_host: rpi3-server
+      ansible_user: rpi3
