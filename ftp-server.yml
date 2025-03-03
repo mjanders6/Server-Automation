@@ -20,22 +20,6 @@
         remote_src: yes
         backup: yes
 
-    - name: Configure vsftpd
-      lineinfile:
-        path: /etc/vsftpd.conf
-        regexp: '^#?(local_enable|write_enable|chroot_local_user|anonymous_enable)='
-        line: "{{ item }}"
-      loop:
-        - "local_enable=YES"
-        - "write_enable=YES"
-        - "chroot_local_user=YES"
-        - "anonymous_enable=NO"
-
-    - name: Restart vsftpd
-      service:
-        name: vsftpd
-        state: restarted
-
     - name: Allow FTP ports in UFW
       ufw:
         rule: allow
