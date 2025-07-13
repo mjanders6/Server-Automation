@@ -1,0 +1,35 @@
+---
+- name: Install Webmin on selected servers
+  hosts: webmin_targets
+  become: yes
+  tasks:
+
+    - name: Ensure dependencies are installed
+      apt:
+        name:
+          - perl
+          - libnet-ssleay-perl
+          - openssl
+          - libauthen-pam-perl
+          - libpam-runtime
+          - libio-pty-perl
+          - apt-show-versions
+          - python3
+        state: present
+        update_cache: yes
+
+    - name: Download latest Webmin .deb package
+      get_url:
+        url: https://www.webmin.com/download/deb/webmin-current.deb
+        dest: /tmp/webmin-current.deb
+        mode: '0644'
+
+    - name: Install Webmin using dpkg
+      apt:
+        deb: /tmp/webmin-current.deb
+
+    - name: Ensure Webmin is started and enabled
+      systemd:
+        name: webmin
+        state: started
+        enabled: yes
