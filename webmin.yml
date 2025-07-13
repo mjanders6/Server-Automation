@@ -1,9 +1,9 @@
 ---
 - name: Install Webmin on selected servers
-  hosts: webmin_targets
+  hosts: all
   become: yes
+  
   tasks:
-
     - name: Ensure dependencies are installed
       apt:
         name:
