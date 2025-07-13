@@ -23,4 +23,4 @@ echo "[+] Installing Webmin..."
 sudo dpkg -i /tmp/webmin.deb || true  # Allow failure if dependencies are missing
 
 echo "[+] Fixing missing dependencies..."
-sudo apt -f
+sudo apt --fix-broken install
