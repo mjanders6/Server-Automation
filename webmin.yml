@@ -33,6 +33,3 @@
         name: webmin
         state: started
         enabled: yes
-
-    - name: Run local install-webmin.sh on remote host
-      script: scripts/install-webmin.sh
