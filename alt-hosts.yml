@@ -1,8 +1,6 @@
 ---
 all:
   hosts:
-    localhost:
-      ansible_connection: local
     rpi1:
       ansible_host: rpi1-server
       ansible_user: rpi1

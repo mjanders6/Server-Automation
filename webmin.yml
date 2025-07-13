@@ -2,7 +2,7 @@
 - name: Install Webmin on selected servers
   hosts: all
   become: yes
-  
+
   tasks:
     - name: Ensure dependencies are installed
       apt:
@@ -33,3 +33,6 @@
         name: webmin
         state: started
         enabled: yes
+
+    - name: Run local install-webmin.sh on remote host
+      script: scripts/install-webmin.sh
