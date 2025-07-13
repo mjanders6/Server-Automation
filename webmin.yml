@@ -15,6 +15,7 @@
           - libio-pty-perl
           - apt-show-versions
           - python3
+          - unzip
         state: present
         update_cache: yes
 
