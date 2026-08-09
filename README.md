@@ -1,11 +1,10 @@
 # Server-Automation
-Automate home server with Ansible
-
-I am in the process of learning how to use automation in my small RPi Stack home lab.
+This is still a good resource. Most of the server rebuild and automation is moving to [Home Lab Framework](https://github.com/mjanders6/Homelab-Framework).
 
 
 # Server Stack Breakdown
-- rpi0 - Ansible Main
-- rpi1 - Possible SIEM
-- rpi2 - Kali setup
-- rpi3 - Minecraft Server
+- rpi0 - mdWiki
+- rpi1 - Minecraft Server
+- rpi2 - TBD
+- rpi3 - Docker Manager & Ansible Main
+- tower - Webmin & Tailscale
